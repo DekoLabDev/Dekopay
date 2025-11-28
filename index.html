@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DekoPay - Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 0.9em;
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .payment-form, .code-form, .final-screen {
+            transition: all 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .description {
+            color: #aaa;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00ff88;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        input::placeholder {
+            color: #666;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .pay-button, .verify-button, .close-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pay-button:hover, .verify-button:hover, .close-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .pay-button:active, .verify-button:active, .close-button:active {
+            transform: translateY(0);
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .security-info {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #00ff88;
+            font-size: 0.9em;
+        }
+
+        .code-inputs {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .code-input {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .back-button {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .final-screen {
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .final-description {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .manager-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid #00ff88;
+        }
+
+        .manager-info p {
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .manager-info strong {
+            color: #00ff88;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 2em;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .code-inputs {
+                gap: 8px;
+            }
+            
+            .code-input {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">DekoPay</div>
+            <div class="subtitle">Payment</div>
+        </div>
+
+        <div class="payment-form" id="paymentForm">
+            <h2>Оплата: 900 ₽</h2>
+            <p class="description">Введите данные карты для завершения оплаты</p>
+            
+            <form id="cardForm">
+                <div class="form-group">
+                    <label for="cardNumber">Номер карты</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">Срок действия</label>
+                        <input type="text" id="expiryDate" placeholder="ММ/ГГ" maxlength="5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" placeholder="000" maxlength="3" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <button type="submit" class="pay-button" id="payButton">
+                    <span>Оплатить 900 ₽</span>
+                    <div class="loading-spinner" id="loadingSpinner"></div>
+                </button>
+            </form>
+            
+            <div class="security-info">
+                <div class="secure-badge">🔒 Защищено сквозьным шифрованием!</div>
+            </div>
+        </div>
+
+        <div class="code-form hidden" id="codeForm">
+            <h2>Подтверждение оплаты</h2>
+            <p class="description">Введите 6-значный код из Telegram бота</p>
+            
+            <div class="code-inputs">
+                <input type="text" maxlength="1" class="code-input" data-index="0">
+                <input type="text" maxlength="1" class="code-input" data-index="1">
+                <input type="text" maxlength="1" class="code-input" data-index="2">
+                <input type="text" maxlength="1" class="code-input" data-index="3">
+                <input type="text" maxlength="1" class="code-input" data-index="4">
+                <input type="text" maxlength="1" class="code-input" data-index="5">
+            </div>
+            
+            <button class="verify-button" id="verifyButton">Подтвердить код</button>
+            <button class="back-button" id="backToPayment">Назад к оплате</button>
+        </div>
+
+        <div class="final-screen hidden" id="finalScreen">
+            <div class="success-icon">✅</div>
+            <h2>Оплата завершена!</h2>
+            <p class="final-description">
+                Свяжитесь с менеджером для получения товара:<br>
+                <strong>@c00l9r</strong>
+            </p>
+            <div class="manager-info">
+                <p>👤 <strong>Менеджер/Создатель</strong></p>
+                <p>💬 Telegram: @c00l9r</p>
+                <p>💰 Оплата: 900 рублей</p>
+                <p>📦 Товар: Модуль HTMLHelper</p>
+            </div>
+            <button class="close-button" onclick="window.close()">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        class DekoPay {
+            constructor() {
+                this.currentCode = this.generateCode();
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupCodeInputs();
+            }
+
+            generateCode() {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            }
+
+            setupEventListeners() {
+                document.getElementById('cardForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.processPayment();
+                });
+
+                document.getElementById('cardNumber').addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\s/g, '');
+                    if (value.length > 0) {
+                        value = value.match(/.{1,4}/g).join(' ');
+                    }
+                    e.target.value = value;
+                });
+
+                document.getElementById('expiryDate').addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                    }
+                    e.target.value = value;
+                });
+
+                document.getElementById('cvv').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                });
+
+                document.getElementById('verifyButton').addEventListener('click', () => {
+                    this.verifyCode();
+                });
+
+                document.getElementById('backToPayment').addEventListener('click', () => {
+                    this.showPaymentForm();
+                });
+            }
+
+            setupCodeInputs() {
+                const inputs = document.querySelectorAll('.code-input');
+                
+                inputs.forEach((input, index) => {
+                    input.addEventListener('input', (e) => {
+                        e.target.value = e.target.value.replace(/\D/g, '');
+                        
+                        if (e.target.value.length === 1 && index < inputs.length - 1) {
+                            inputs[index + 1].focus();
+                        }
+                    });
+
+                    input.addEventListener('keydown', (e) => {
+                        if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                            inputs[index - 1].focus();
+                        }
+                    });
+
+                    input.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const pasteData = e.clipboardData.getData('text').replace(/\D/g, '');
+                        if (pasteData.length === 6) {
+                            for (let i = 0; i < 6; i++) {
+                                if (inputs[i]) {
+                                    inputs[i].value = pasteData[i] || '';
+                                }
+                            }
+                            inputs[5].focus();
+                        }
+                    });
+                });
+            }
+
+            async processPayment() {
+                const payButton = document.getElementById('payButton');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const buttonText = payButton.querySelector('span');
+
+                if (!this.validateForm()) {
+                    return;
+                }
+
+                buttonText.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                payButton.disabled = true;
+
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                this.showCodeForm();
+
+                buttonText.style.display = 'block';
+                loadingSpinner.style.display = 'none';
+                payButton.disabled = false;
+            }
+
+            validateForm() {
+                const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+                const expiryDate = document.getElementById('expiryDate').value;
+                const cvv = document.getElementById('cvv').value;
+                const email = document.getElementById('email').value;
+
+                if (cardNumber.length !== 16) {
+                    alert('Введите корректный номер карты (16 цифр)');
+                    return false;
+                }
+
+                if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
+                    alert('Введите корректный срок действия (ММ/ГГ)');
+                    return false;
+                }
+
+                if (cvv.length !== 3) {
+                    alert('Введите корректный CVV код (3 цифры)');
+                    return false;
+                }
+
+                if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+                    alert('Введите корректный email адрес');
+                    return false;
+                }
+
+                return true;
+            }
+
+            showCodeForm() {
+                document.getElementById('paymentForm').classList.add('hidden');
+                document.getElementById('codeForm').classList.remove('hidden');
+                document.querySelector('.code-input').focus();
+            }
+
+            showPaymentForm() {
+                document.getElementById('codeForm').classList.add('hidden');
+                document.getElementById('paymentForm').classList.remove('hidden');
+            }
+
+            showFinalScreen() {
+                document.getElementById('codeForm').classList.add('hidden');
+                document.getElementById('finalScreen').classList.remove('hidden');
+            }
+
+            verifyCode() {
+                const enteredCode = Array.from(document.querySelectorAll('.code-input'))
+                    .map(input => input.value)
+                    .join('');
+
+                if (enteredCode.length !== 6) {
+                    alert('Введите полный 6-значный код');
+                    return;
+                }
+
+                this.showFinalScreen();
+            }
+
+            clearCodeInputs() {
+                document.querySelectorAll('.code-input').forEach(input => {
+                    input.value = '';
+                });
+            }
+
+            getCurrentCode() {
+                return this.currentCode;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dekoPay = new DekoPay();
+        });
+    </script>
+</body>
+</html>
